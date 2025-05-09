@@ -1,11 +1,10 @@
-package openai
+package gollm
 
 import (
 	"context"
 	"errors"
 	"fmt"
 
-	"github.com/dickeyy/gollm"
 	oai "github.com/sashabaranov/go-openai"
 )
 
@@ -44,7 +43,7 @@ func NewOpenAiModel(modelName string, apiKey string, apiURL string) (*OpenAIMode
 }
 
 // Chat implements the gollm.LLM interface.
-func (m *OpenAIModel) Chat(structure gollm.ChatStructure) (*gollm.ChatResponse, error) {
+func (m *OpenAIModel) Chat(structure ChatStructure) (*ChatResponse, error) {
 	if m.client == nil {
 		return nil, errors.New("OpenAI client not initialized")
 	}
@@ -77,14 +76,14 @@ func (m *OpenAIModel) Chat(structure gollm.ChatStructure) (*gollm.ChatResponse, 
 		return nil, errors.New("no response content received from OpenAI")
 	}
 
-	return &gollm.ChatResponse{
+	return &ChatResponse{
 		Text: resp.Choices[0].Message.Content,
 	}, nil
 }
 
 // init registers the OpenAI model constructors with the gollm factory.
 func init() {
-	constructor := func(modelName string, apiKey string, apiURL string) (gollm.LLM, error) {
+	constructor := func(modelName string, apiKey string, apiURL string) (LLM, error) {
 		model, err := NewOpenAiModel(modelName, apiKey, apiURL)
 		if err != nil {
 			return nil, err
@@ -94,6 +93,6 @@ func init() {
 
 	modelsToRegister := []string{"gpt-4o", "gpt-4", "gpt-3.5-turbo", "gpt-4o-mini"}
 	for _, modelName := range modelsToRegister {
-		gollm.RegisterModel(modelName, constructor)
+		RegisterModel(modelName, constructor)
 	}
 }
